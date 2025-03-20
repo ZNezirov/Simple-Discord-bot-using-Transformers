@@ -2,8 +2,7 @@ import discord
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
+load_dotenv(dotenv_path='DISCORD CHAT BOT/token.env')
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 
 intents = discord.Intents.default()
@@ -22,25 +21,30 @@ model_name = 'gpt2'
 model = GPT2LMHeadModel.from_pretrained(model_name)
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 
-conversation_history = {}
-
-def generate_response(user_id, prompt):  
-    if user_id not in conversation_history:
-        conversation_history[user_id] = []
-    conversation_history[user_id].append(prompt)
-    inputs = tokenizer.encode(" ".join(conversation_history[user_id][-5:]), return_tensors="pt")  # Keep last 5 messages
-    outputs = model.generate(inputs, max_new_tokens=30, no_repeat_ngram_size=2, top_p=0.95, temperature=0.2)
+def generate_response(prompt):  
+    inputs = tokenizer.encode(prompt, return_tensors="pt")
+    outputs = model.generate(
+    inputs, 
+    max_new_tokens=30, 
+    no_repeat_ngram_size=2,
+    top_p=0.6,
+    top_k=10,   
+    temperature=0.2, 
+    do_sample=True
+)
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    conversation_history[user_id].append(response)
+    if prompt.lower() in response.lower():
+        response = response[len(prompt):].strip() #We remove the prompt from the response so that the bot doesnt 
+                                                  #repeat the prompt
+
     return response
 
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
-    if message.content.lower() in ["hello bot", "hi bot", "yo"]:
-        await message.channel.send("Hey there!!! How can I assist you today?????")
-    elif message.content.startswith('!bot'):
+    
+    if message.content.startswith('!bot'):
         prompt= message.content[len('!bot '):].strip()
         if prompt:
             response = generate_response(prompt)

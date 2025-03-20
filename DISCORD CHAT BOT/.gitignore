@@ -1,0 +1,3 @@
+# Ignore the token.env file inside the discord_chat_bot folder
+DISCORD CHAT BOT/token.env
+*.env

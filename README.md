@@ -1,6 +1,5 @@
-In the token.env file you will find the line;
+In the DTOKEN.env file you wll find DISCORD_TOKEN = 'YOUR_TOKEN'
 
-
-DISCORD_TOKEN=YOUR_TOKEN
-
-put your discord token in place of the YOUR_TOKEN, then run the code in VScode or any other code editor
+1. Put your Discord token in the YOUR_TOKEN
+2. in main.py on line5, change 'token.env' to 'DTOKEN.env'
+3. Run the code
